@@ -1,0 +1,1 @@
+﻿export { AppRoutes } from "./RouterConfig";
