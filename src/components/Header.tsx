@@ -8,13 +8,16 @@ import {
   Bell,
   ChevronDown,
   LogOut,
-  User,
+  User as UserIcon,
   Settings,
   HelpCircle,
   LayoutDashboard,
   Globe,
+  Users,
 } from "lucide-react";
 import { useAuthUser } from "../features/auth";
+import { useAppSelector } from "../app/hooks";
+import { RootState } from "../app/store";
 
 interface HeaderProps {
   isAuthenticated: boolean;
@@ -26,14 +29,11 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
+  // Obtener el usuario del estado de Redux
+  const user = useAppSelector((state: RootState) => state.auth.user);
+
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
   const closeDropdown = () => setIsDropdownOpen(false);
-
-  const currentUser = {
-    profilePicture:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200",
-    userName: "Ana Pérez",
-  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,13 +42,28 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated }) => {
     }
   };
 
+  const handleCreateGroup = () => {
+    navigate("/groups/create");
+  };
+
+  // Función para obtener las iniciales del usuario
+  const getUserInitials = () => {
+    if (!user?.userName) return "US";
+    const names = user.userName.split(" ");
+    return names
+      .map((name) => name[0])
+      .join("")
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
   return (
     <header className="bg-orange-300 border-b border-gray-200 shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link
-            to="/"
+            to={isAuthenticated ? "/dashboard" : "/"}
             className="flex items-center gap-2 group"
             aria-label="Inicio"
           >
@@ -69,13 +84,13 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated }) => {
               </svg>
             </div>
             <span className="text-xl font-bold text-gray-900 group-hover:text-orange-600 transition-colors">
-              InterConnect
+              interesesComunes
             </span>
           </Link>
 
           {isAuthenticated ? (
             <>
-              {/* Search Bar - Centered */}
+              {/* Search Bar */}
               <div className="flex-1 max-w-2xl mx-4 hidden md:block">
                 <form onSubmit={handleSearch} className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -95,23 +110,30 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated }) => {
                 </form>
               </div>
 
-              {/* Navigation Icons */}
+              {/* Icons and Profile */}
               <div className="flex items-center space-x-4">
                 <button
+                  onClick={handleCreateGroup}
                   className="p-2 rounded-full hover:bg-gray-100 text-gray-600 hover:text-orange-600 relative transition-colors"
                   aria-label="Crear grupo"
                 >
                   <PlusCircle className="h-5 w-5" />
-                  <span className="sr-only">Crear grupo</span>
                 </button>
+
+                <Link
+                  to="/groups"
+                  className="p-2 rounded-full hover:bg-gray-100 text-gray-600 hover:text-orange-600 relative transition-colors"
+                  aria-label="Grupos"
+                >
+                  <Users className="h-5 w-5" />
+                </Link>
 
                 <button
                   className="p-2 rounded-full hover:bg-gray-100 text-gray-600 hover:text-orange-600 relative transition-colors"
                   aria-label="Mensajes"
                 >
                   <MessageSquare className="h-5 w-5" />
-                  <span className="sr-only">Mensajes</span>
-                  <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-orange-500"></span>
+                  <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-orange-500" />
                 </button>
 
                 <button
@@ -119,36 +141,36 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated }) => {
                   aria-label="Notificaciones"
                 >
                   <Bell className="h-5 w-5" />
-                  <span className="sr-only">Notificaciones</span>
-                  <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-orange-500"></span>
+                  <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-orange-500" />
                 </button>
 
-                {/* Language Selector */}
+                {/* Language */}
                 <div className="relative hidden lg:block">
-                  <button
-                    className="flex items-center text-gray-600 hover:text-orange-600 p-2 rounded-full hover:bg-gray-100 transition-colors"
-                    aria-label="Idioma"
-                  >
+                  <button className="flex items-center text-gray-600 hover:text-orange-600 p-2 rounded-full hover:bg-gray-100 transition-colors">
                     <Globe className="h-5 w-5" />
                     <span className="ml-1 text-sm">ES</span>
                   </button>
                 </div>
 
-                {/* Profile Dropdown */}
+                {/* Dropdown */}
                 <div className="relative ml-2">
                   <button
                     onClick={toggleDropdown}
                     className="flex items-center space-x-1 focus:outline-none group"
-                    aria-expanded={isDropdownOpen}
                     aria-label="Menú de usuario"
                   >
-                    <img
-                      src={currentUser.profilePicture}
-                      alt={`Perfil de ${currentUser.userName}`}
-                      className="h-8 w-8 rounded-full object-cover border-2 border-white shadow-sm group-hover:border-orange-200 transition-colors"
-                    />
+                    {/* Avatar con iniciales o icono */}
+                    <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center border-2 border-white shadow-sm group-hover:border-orange-200 transition-colors">
+                      {user?.userName ? (
+                        <span className="font-medium text-gray-700">
+                          {getUserInitials()}
+                        </span>
+                      ) : (
+                        <UserIcon className="h-4 w-4 text-gray-600" />
+                      )}
+                    </div>
                     <span className="hidden lg:inline-block text-sm font-medium text-gray-700">
-                      {currentUser.userName}
+                      {user?.userName || "Usuario"}
                     </span>
                     <ChevronDown
                       className={`h-4 w-4 text-gray-500 transition-transform ${
@@ -163,17 +185,14 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated }) => {
                         className="fixed inset-0 bg-transparent z-40"
                         onClick={closeDropdown}
                         aria-hidden="true"
-                      ></div>
+                      />
                       <div
                         className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl py-1 z-50 border border-gray-100"
                         onMouseLeave={closeDropdown}
                       >
                         <div className="px-4 py-3 border-b border-gray-100">
                           <p className="text-sm font-medium text-gray-900">
-                            {currentUser.userName}
-                          </p>
-                          <p className="text-xs text-gray-500 truncate">
-                            ana.perez@ejemplo.com
+                            {user?.userName || "Usuario"}
                           </p>
                         </div>
 
@@ -190,8 +209,16 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated }) => {
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                           onClick={closeDropdown}
                         >
-                          <User className="h-4 w-4 mr-2 text-gray-500" />
+                          <UserIcon className="h-4 w-4 mr-2 text-gray-500" />
                           Mi perfil
+                        </Link>
+                        <Link
+                          to="/groups"
+                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          onClick={closeDropdown}
+                        >
+                          <Users className="h-4 w-4 mr-2 text-gray-500" />
+                          Mis grupos
                         </Link>
                         <Link
                           to="/settings"
@@ -210,7 +237,7 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated }) => {
                           Ayuda
                         </Link>
 
-                        <div className="border-t border-gray-100 my-1"></div>
+                        <div className="border-t border-gray-100 my-1" />
 
                         <button
                           onClick={() => {
@@ -252,7 +279,7 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated }) => {
           )}
         </div>
 
-        {/* Mobile Search - Only visible on small screens */}
+        {/* Mobile Search */}
         {isAuthenticated && (
           <div className="pb-3 px-2 md:hidden">
             <form onSubmit={handleSearch} className="relative">

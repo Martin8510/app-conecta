@@ -10,7 +10,6 @@ import {
   Facebook,
   Linkedin,
   HelpCircle,
-  Mail,
   Shield,
 } from "lucide-react";
 

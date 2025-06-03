@@ -20,7 +20,19 @@ export class LocalStorageAuthPersister implements IAuthStorage {
 
   save(authData: Auth): void {
     try {
-      localStorage.setItem(AUTH_KEY, JSON.stringify(authData));
+      localStorage.setItem(
+        AUTH_KEY,
+        JSON.stringify({
+          userName: authData.userName,
+          password: authData.password,
+          token: authData.token,
+          msg: authData.msg,
+          idUser: authData.idUser,
+          idMember: authData.idMember,
+          idOwner: authData.idOwner,
+          idAdmin: authData.idAdmin,
+        })
+      );
     } catch (error) {
       console.error("Error saving auth data to localStorage", error);
       throw new Error("Failed to save authentication data");
@@ -30,7 +42,19 @@ export class LocalStorageAuthPersister implements IAuthStorage {
   get(): Auth | null {
     try {
       const userJson = localStorage.getItem(AUTH_KEY);
-      return userJson ? (JSON.parse(userJson) as Auth) : null;
+      if (!userJson) return null;
+
+      const data = JSON.parse(userJson);
+      return {
+        userName: data.userName,
+        password: data.password,
+        token: data.token,
+        msg: data.msg || "",
+        idUser: data.idUser || null,
+        idMember: data.idMember || null,
+        idOwner: data.idOwner || null,
+        idAdmin: data.idAdmin || null,
+      };
     } catch (error) {
       console.error("Error reading auth data from localStorage", error);
       return null;

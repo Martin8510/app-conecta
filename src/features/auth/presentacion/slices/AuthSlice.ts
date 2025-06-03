@@ -6,12 +6,20 @@ interface AuthState {
   user: Auth | null;
   loading: boolean;
   error: string | null;
+  userId: number | null;
+  memberId: number | null;
+  ownerId: number | null;
+  adminId: number | null;
 }
 
 const initialState: AuthState = {
   user: LocalStorageAuthPersister.getInstance().get() ?? null,
   loading: false,
   error: null,
+  userId: LocalStorageAuthPersister.getInstance().get()?.idUser || null,
+  memberId: LocalStorageAuthPersister.getInstance().get()?.idMember || null,
+  ownerId: LocalStorageAuthPersister.getInstance().get()?.idOwner || null,
+  adminId: LocalStorageAuthPersister.getInstance().get()?.idAdmin || null,
 };
 
 const authSlice = createSlice({
@@ -26,8 +34,11 @@ const authSlice = createSlice({
     loginSuccess(state, action: PayloadAction<Auth>) {
       state.loading = false;
       state.user = action.payload;
+      state.userId = action.payload.idUser;
+      state.memberId = action.payload.idMember;
+      state.ownerId = action.payload.idOwner;
+      state.adminId = action.payload.idAdmin;
       state.error = null;
-      console.log("loginSuccess :" + state);
     },
     loginFailure(state, action: PayloadAction<string>) {
       state.loading = false;
@@ -36,6 +47,10 @@ const authSlice = createSlice({
     },
     logoutSuccess(state) {
       state.user = null;
+      state.userId = null;
+      state.memberId = null;
+      state.ownerId = null;
+      state.adminId = null;
     },
   },
 });

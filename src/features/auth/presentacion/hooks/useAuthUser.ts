@@ -17,6 +17,7 @@ export const useAuthUser = () => {
       dispatch(loginStart());
       const authData = await signIn(user);
       dispatch(loginSuccess(authData));
+      return authData;
     } catch (error) {
       let errorMessage = "Error desconocido";
       if (error instanceof Error) {

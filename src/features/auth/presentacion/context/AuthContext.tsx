@@ -11,6 +11,10 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   isAuthenticated: boolean;
   user: Auth | null;
+  userId: number | null;
+  memberId: number | null;
+  ownerId: number | null;
+  adminId: number | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -51,6 +55,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     signOut,
     isAuthenticated: !!user,
     user,
+    userId: user?.idUser || null,
+    memberId: user?.idMember || null,
+    ownerId: user?.idOwner || null,
+    adminId: user?.idAdmin || null,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

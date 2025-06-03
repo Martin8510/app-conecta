@@ -7,8 +7,6 @@ import { RootState, useAppSelector } from "../app/store";
 const Layout: React.FC = () => {
   const { user } = useAppSelector((state: RootState) => state.auth);
 
-  console.log("Layout :" + user);
-
   return (
     <div className="min-h-screen flex flex-col justify-between">
       <Header isAuthenticated={!!user} />

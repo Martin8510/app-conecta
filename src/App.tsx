@@ -3,15 +3,18 @@ import { ReduxProvider } from "./app/store";
 import { AuthProviderWithService } from "./features/auth/presentacion";
 import { UserProviderWithService } from "./features/user/presentacion";
 import { AppRoutes } from "./routes";
+import { GroupProviderWithService } from "./features/group/presentation";
 
 function App() {
   return (
     <ReduxProvider>
       <AuthProviderWithService>
         <UserProviderWithService>
-          <Router>
-            <AppRoutes />
-          </Router>
+          <GroupProviderWithService>
+            <Router>
+              <AppRoutes />
+            </Router>
+          </GroupProviderWithService>
         </UserProviderWithService>
       </AuthProviderWithService>
     </ReduxProvider>

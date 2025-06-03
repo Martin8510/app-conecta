@@ -1,6 +1,8 @@
 ﻿import { configureStore } from "@reduxjs/toolkit";
 import { authReducer } from "../features/auth/presentacion";
 import { userReducer } from "../features/user/presentacion";
+import { groupReducer } from "../features/group/presentation";
+
 import {
   TypedUseSelectorHook,
   useDispatch,
@@ -13,7 +15,7 @@ export const store = configureStore({
   reducer: {
     auth: authReducer,
     user: userReducer,
-    // otros reducers...
+    group: groupReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

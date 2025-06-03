@@ -1,10 +1,42 @@
-﻿import React from "react";
-import { useAppSelector } from "../app/hooks";
+﻿// src/features/group/presentation/pages/DashboardPage.tsx
+import React, { useEffect } from "react";
+import { useAppSelector, useAppDispatch } from "../app/hooks";
 import { RootState } from "../app/store";
-import { CalendarDays, Share2, ArrowRight, MoreHorizontal } from "lucide-react";
+import {
+  CalendarDays,
+  Share2,
+  ArrowRight,
+  MoreHorizontal,
+  Plus,
+  Users,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+import { Button } from "../components";
+import {
+  GroupErrorModal,
+  updateGroupFailure,
+  useGroupContext,
+} from "../features/group";
 
 export const DashboardPage: React.FC = () => {
   const { user } = useAppSelector((state: RootState) => state.auth);
+  const { groups, error } = useAppSelector((state: RootState) => state.group);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { getGroups } = useGroupContext();
+
+  useEffect(() => {
+    const loadGroups = async () => {
+      try {
+        await getGroups();
+      } catch (err) {
+        console.error("Error loading groups:", err);
+      }
+    };
+
+    loadGroups();
+  }, [getGroups]);
 
   if (!user) return null;
 
@@ -24,27 +56,6 @@ export const DashboardPage: React.FC = () => {
       details: "17 Nov | Online",
       time: "19:00 - 21:00",
       category: "Literatura",
-    },
-  ];
-
-  const myGroups = [
-    {
-      id: 1,
-      image:
-        "https://images.unsplash.com/photo-1575728256505-768d29253f00?w=200",
-      name: "Amantes del Senderismo",
-      details: "Próxima salida: Sábado",
-      members: 24,
-      newPosts: 3,
-    },
-    {
-      id: 2,
-      image:
-        "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?w=200",
-      name: "Fotografía Urbana",
-      details: "Reunión: Jueves 7 PM",
-      members: 18,
-      newPosts: 5,
     },
   ];
 
@@ -155,13 +166,23 @@ export const DashboardPage: React.FC = () => {
     <div className="py-8 px-4 sm:px-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Encabezado */}
-        <div className="text-center">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
-            ¡Hola, <span className="text-indigo-600">{user.userName}</span>! 👋
-          </h1>
-          <p className="text-gray-600 text-base sm:text-lg mt-2 max-w-2xl mx-auto">
-            Aquí tienes un resumen de tu actividad, grupos y próximos eventos.
-          </p>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
+              ¡Hola, <span className="text-indigo-600">{user.userName}</span>!
+              👋
+            </h1>
+            <p className="text-gray-600 text-base sm:text-lg mt-2 max-w-2xl">
+              Aquí tienes un resumen de tu actividad, grupos y próximos eventos.
+            </p>
+          </div>
+          <Button
+            onClick={() => navigate("/groups/create")}
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700"
+          >
+            <Plus size={18} />
+            <span>Crear nuevo grupo</span>
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -174,7 +195,10 @@ export const DashboardPage: React.FC = () => {
                 <h2 className="text-lg font-semibold text-gray-900">
                   Próximos eventos
                 </h2>
-                <button className="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+                <button
+                  className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                  onClick={() => navigate("/events")}
+                >
                   Ver todos
                 </button>
               </div>
@@ -216,37 +240,34 @@ export const DashboardPage: React.FC = () => {
                 <h2 className="text-lg font-semibold text-gray-900">
                   Tus grupos
                 </h2>
-                <button className="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+                <button
+                  className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                  onClick={() => navigate("/groups")}
+                >
                   Ver todos
                 </button>
               </div>
               <div className="space-y-4">
-                {myGroups.map((group) => (
+                {groups.slice(0, 3).map((group) => (
                   <div
                     key={group.id}
                     className="group flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                    onClick={() => navigate(`/groups/${group.id}`)}
                   >
-                    <img
-                      src={group.image}
-                      alt={group.name}
-                      className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
-                    />
+                    <div className="bg-indigo-100 p-2 rounded-lg text-indigo-600">
+                      <Users className="h-5 w-5" />
+                    </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-gray-900 truncate">
                         {group.name}
                       </p>
                       <p className="text-xs text-gray-500 mt-0.5">
-                        {group.details}
+                        {group.location}
                       </p>
-                      <div className="flex items-center gap-3 mt-2">
-                        <span className="text-xs text-gray-500">
-                          {group.members} miembros
+                      <div className="mt-2">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          {group.category.name}
                         </span>
-                        {group.newPosts > 0 && (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            {group.newPosts} nuevos
-                          </span>
-                        )}
                       </div>
                     </div>
                     <button className="text-gray-400 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -254,6 +275,18 @@ export const DashboardPage: React.FC = () => {
                     </button>
                   </div>
                 ))}
+                {groups.length === 0 && (
+                  <div className="text-center py-4">
+                    <p className="text-gray-500">No tienes grupos aún</p>
+                    <Button
+                      onClick={() => navigate("/groups/create")}
+                      className="mt-2 text-sm"
+                      variant="outline"
+                    >
+                      Crear mi primer grupo
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -347,7 +380,7 @@ export const DashboardPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Sección adicional de estadísticas */}
+            {/* Sección de estadísticas */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm transition-all hover:shadow-md">
                 <div className="flex items-center justify-between">
@@ -370,25 +403,14 @@ export const DashboardPage: React.FC = () => {
                     Grupos activos
                   </h3>
                   <div className="p-2 rounded-lg bg-green-50 text-green-600">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                      />
-                    </svg>
+                    <Users className="h-5 w-5" />
                   </div>
                 </div>
-                <p className="mt-3 text-2xl font-bold text-gray-900">5</p>
+                <p className="mt-3 text-2xl font-bold text-gray-900">
+                  {groups.length}
+                </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  3 con actividad reciente
+                  {groups.filter((g) => g.status === "ACTIVO").length} activos
                 </p>
               </div>
 
@@ -423,6 +445,13 @@ export const DashboardPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {error && (
+        <GroupErrorModal
+          error={error}
+          onClose={() => dispatch(updateGroupFailure(""))}
+        />
+      )}
     </div>
   );
 };
