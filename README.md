@@ -9,6 +9,17 @@ Permite gestionar usuarios, autenticación mediante JWT y la organización de in
 \## 📌 Requisitos mínimos para la instalación
 
 Antes de comenzar, asegúrate de tener instaladas las siguientes herramientas en tu máquina:
+\# 📡 App Conecta — Proyecto Completo (Frontend + Backend)
+
+\*\*App Conecta\*\* es una aplicación web desarrollada con \*\*React + TypeScript\*\* en el frontend y \*\*Spring Boot\*\* en el backend, utilizando \*\*MySQL\*\* como base de datos.
+
+Permite gestionar usuarios, autenticación mediante JWT y la organización de intereses comunes entre miembros de una red social temática.
+
+\---
+
+\## 📌 Requisitos mínimos para la instalación
+
+Antes de comenzar, asegúrate de tener instaladas las siguientes herramientas en tu máquina:
 
 - [Node.js](https://nodejs.org/en) (v18 o superior)
 - [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/) (v1.22 o superior)
